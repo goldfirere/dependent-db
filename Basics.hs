@@ -6,7 +6,7 @@
              TypeInType, ConstraintKinds, UndecidableInstances,
              FlexibleInstances, MultiParamTypeClasses, FunctionalDependencies,
              FlexibleContexts, StandaloneDeriving, InstanceSigs,
-             RankNTypes, UndecidableSuperClasses #-}
+             RankNTypes, UndecidableSuperClasses, AllowAmbiguousTypes #-}
 
 module Basics where
 
@@ -79,9 +79,8 @@ data TyCon (a :: k) where
   Maybe :: TyCon Maybe
   Arrow :: TyCon (->)
   TYPE  :: TyCon TYPE
-  Levity :: TyCon Levity
-  Lifted' :: TyCon 'Lifted
-  Unlifted' :: TyCon 'Unlifted
+  RuntimeRep :: TyCon RuntimeRep
+  PtrRepLifted' :: TyCon 'PtrRepLifted
   -- If extending, add to eqTyCon too
 
 eqTyCon :: TyCon a -> TyCon b -> Maybe (a :~~: b)
@@ -92,9 +91,8 @@ eqTyCon List List = Just HRefl
 eqTyCon Maybe Maybe = Just HRefl
 eqTyCon Arrow Arrow = Just HRefl
 eqTyCon TYPE TYPE = Just HRefl
-eqTyCon Levity Levity = Just HRefl
-eqTyCon Lifted' Lifted' = Just HRefl
-eqTyCon Unlifted' Unlifted' = Just HRefl
+eqTyCon RuntimeRep RuntimeRep = Just HRefl
+eqTyCon PtrRepLifted' PtrRepLifted' = Just HRefl
 eqTyCon _ _ = Nothing
 
 -- Check whether or not a type is really a plain old tycon;
@@ -211,9 +209,8 @@ instance TyConAble []        where tyCon = List
 instance TyConAble Maybe     where tyCon = Maybe
 instance TyConAble (->)      where tyCon = Arrow
 instance TyConAble TYPE      where tyCon = TYPE
-instance TyConAble 'Unlifted where tyCon = Unlifted'
-instance TyConAble 'Lifted   where tyCon = Lifted'
-instance TyConAble Levity    where tyCon = Levity
+instance TyConAble 'PtrRepLifted   where tyCon = PtrRepLifted'
+instance TyConAble RuntimeRep    where tyCon = RuntimeRep
 
 -- Can't just define Typeable the way we want, because the instances
 -- overlap. So we have to mock up instance chains via closed type families.

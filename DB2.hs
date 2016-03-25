@@ -12,7 +12,7 @@ It is based on the database implementation from Oury and Swierstra's
     GADTs, TypeOperators, RankNTypes, FlexibleContexts, UndecidableInstances,
     FlexibleInstances, ScopedTypeVariables, MultiParamTypeClasses,
     ConstraintKinds, CPP, InstanceSigs, TypeInType, TypeApplications,
-    ParallelListComp, UndecidableSuperClasses #-}
+    ParallelListComp, UndecidableSuperClasses, AllowAmbiguousTypes #-}
 {-# OPTIONS_GHC -fwarn-unticked-promoted-constructors #-}
 
 module DB2 where
@@ -326,7 +326,8 @@ checkIn name ty ((Col name' ty') :>> rest) callback
                                              " but it maps to " ++ show ty')
       _                      -> checkIn name ty rest callback
 
-
+-- example call:
+-- checkIn "id" Int schema ({- access "id" and assume it has type Int -})
 
 
 
