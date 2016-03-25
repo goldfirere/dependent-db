@@ -304,16 +304,7 @@ query (Select expr ra) = filter (eval expr) <$> query ra
 field :: forall name ty s. In name ty s => Expr s ty
 field = Element (Proxy :: Proxy name)
 
-
-
-
-
-
-
-
--- A schema is a list of columns, with
--- data Column = Col String Type
--- NB: Dependent type support is still experimental
+-- Establish an In constraint
 checkIn :: Π name -> Π ty -> Π schema
         -> (In name ty schema => r)
         -> r
@@ -325,24 +316,6 @@ checkIn name ty ((Col name' ty') :>> rest) callback
       (Just _,    _)         -> schemaError ("Found " ++ show name ++
                                              " but it maps to " ++ show ty')
       _                      -> checkIn name ty rest callback
-
--- example call:
--- checkIn "id" Int schema ({- access "id" and assume it has type Int -})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 -- Establish a Subset constraint
 checkSubset :: Π sch1 -> Π sch2 -> (Subset sch1 sch2 => r) -> r
