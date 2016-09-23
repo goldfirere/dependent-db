@@ -1,5 +1,11 @@
+{- Copyright (c) 2016 Richard Eisenberg
+
+   This module defines ways of generating code to establish constraints
+   found through TH reification of a database-access function.
+-}
+
 {-# LANGUAGE TemplateHaskellQuotes, TypeApplications, FlexibleContexts,
-             RankNTypes #-}
+             RankNTypes, ScopedTypeVariables #-}
 
 module TH where
 

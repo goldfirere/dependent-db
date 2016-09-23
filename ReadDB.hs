@@ -1,3 +1,9 @@
+{- Copyright (c) 2016 Richard Eisenberg
+
+   This module computes a join of two tables to retrieve the list of students
+   in a given professor's class.
+-}
+
 {-# LANGUAGE TypeApplications, TypeInType, RankNTypes, ScopedTypeVariables,
              FlexibleContexts, TemplateHaskell, ConstraintKinds, GADTs #-}
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
@@ -20,9 +26,9 @@ readDB classes_sch students_sch = do
   putStr "Whose students do you want to see? "
   prof <- getLine
 
-  let joined = Project (
-                Select (field @"id" @Int `ElementOf` field @"students") (
-                 Product (Select (field @"prof" :== Literal prof) (Read classes_tab))
-                         (Read students_tab)))
+  let joined = Project $
+               Select (field @"id" @Int `ElementOf` field @"students") $
+               Product (Select (field @"prof" :== Literal prof) (Read classes_tab))
+                       (Read students_tab)
   rows <- query joined
   mapM_ printName rows

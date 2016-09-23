@@ -1,5 +1,7 @@
 {- Copyright (c) 2016 Richard Eisenberg
- -}
+
+   This module defines all the plumbing needed to power the dependent database.
+-}
 
 {-# LANGUAGE TypeOperators, TypeFamilies, TypeApplications,
              ExplicitForAll, ScopedTypeVariables, GADTs, TypeFamilyDependencies,
