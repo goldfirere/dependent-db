@@ -1,7 +1,7 @@
 {- DB2.hs
 
 (c) Richard Eisenberg 2016
-eir@cis.upenn.edu
+rae@cs.brynmawr.edu
 
 It is based on the database implementation from Oury and Swierstra's
 "Power of Pi", ICFP '08.

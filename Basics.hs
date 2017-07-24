@@ -3,7 +3,7 @@
    This module defines all the plumbing needed to power the dependent database.
 -}
 
-{-# LANGUAGE TypeOperators, TypeFamilies, TypeApplications,
+{-# LANGUAGE CPP, TypeOperators, TypeFamilies, TypeApplications,
              ExplicitForAll, ScopedTypeVariables, GADTs, TypeFamilyDependencies,
              TypeInType, ConstraintKinds, UndecidableInstances,
              FlexibleInstances, MultiParamTypeClasses, FunctionalDependencies,
@@ -13,7 +13,7 @@
 module Basics where
 
 import Data.Type.Bool
-import Data.Type.Equality
+import Data.Type.Equality ((:~:)(..), TestEquality(..), type (==))
 import GHC.TypeLits
 import Data.Proxy
 import GHC.Exts
@@ -73,6 +73,12 @@ Nil %:++ x = x
 -- Type-indexed type representations
 -- Based on "A reflection on types"
 
+#if __GLASGOW_HASKELL__ >= 802
+type LiftedRep = 'LiftedRep
+#else
+type LiftedRep = 'PtrRepLifted
+#endif
+
 data TyCon (a :: k) where
   Int :: TyCon Int
   Bool :: TyCon Bool
@@ -82,7 +88,7 @@ data TyCon (a :: k) where
   Arrow :: TyCon (->)
   TYPE  :: TyCon TYPE
   RuntimeRep :: TyCon RuntimeRep
-  PtrRepLifted' :: TyCon 'PtrRepLifted
+  LiftedRep' :: TyCon LiftedRep
   -- If extending, add to eqTyCon too
 
 eqTyCon :: TyCon a -> TyCon b -> Maybe (a :~~: b)
@@ -94,7 +100,7 @@ eqTyCon Maybe Maybe = Just HRefl
 eqTyCon Arrow Arrow = Just HRefl
 eqTyCon TYPE TYPE = Just HRefl
 eqTyCon RuntimeRep RuntimeRep = Just HRefl
-eqTyCon PtrRepLifted' PtrRepLifted' = Just HRefl
+eqTyCon LiftedRep' LiftedRep' = Just HRefl
 eqTyCon _ _ = Nothing
 
 -- Check whether or not a type is really a plain old tycon;
@@ -211,7 +217,7 @@ instance TyConAble []        where tyCon = List
 instance TyConAble Maybe     where tyCon = Maybe
 instance TyConAble (->)      where tyCon = Arrow
 instance TyConAble TYPE      where tyCon = TYPE
-instance TyConAble 'PtrRepLifted   where tyCon = PtrRepLifted'
+instance TyConAble LiftedRep     where tyCon = LiftedRep'
 instance TyConAble RuntimeRep    where tyCon = RuntimeRep
 
 -- Can't just define Typeable the way we want, because the instances

@@ -18,6 +18,8 @@ import Data.Proxy
 import GHC.TypeLits
 import Basics
 
+import Debug.Trace
+
 -- wrapper for checkIn that uses proxy. Necessary only because Template Haskell
 -- does not yet support visible type application
 checkInProxy :: (KnownSymbol name, Typeable ty) => Proxy name -> Proxy ty
@@ -68,13 +70,16 @@ processPred sch_name_pairs pred
   , [left, right] <- args
   , (ConT disjoint, [sch_ty1, sch_ty2]) <- splitAppTys left
   , disjoint == ''Disjoint
-  , ConT true <- right
+  , Just true <- case right of
+      ConT true      -> Just true   -- GHC 8.0
+      PromotedT true -> Just true   -- GHC 8.2
+      _              -> Nothing
   , true == 'True   -- NB: just one quote!
   = Just $ VarE 'checkDisjoint `AppE` schemaExpression sch_ty1 sch_name_pairs
                                `AppE` schemaExpression sch_ty2 sch_name_pairs
 
   | otherwise
-  = Nothing
+  = trace ("Discarding: " ++ show pred ++ "\nhead: " ++ show head ++ "\nargs: " ++ show args) Nothing
 
   where
     (head, args) = splitAppTys pred
